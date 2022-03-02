@@ -1,4 +1,4 @@
-# ProjectAutomation
+# ProjectDescription
 
 This repository contains mirror for the [ProjectDescription](https://github.com/tuist/tuist/tree/main/Sources/ProjectDescription) framework in the tuist main repository.
 
