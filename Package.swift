@@ -17,7 +17,7 @@ let package = Package(
         .target(
             name: "ProjectDescription",
             dependencies: [],
-            path: "tuist/Sources/ProjectDescription"
+            path: "ProjectDescription"
         ),
     ]
 )
