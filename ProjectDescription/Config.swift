@@ -22,12 +22,7 @@
 ///
 /// let config = Config(
 ///     compatibleXcodeVersions: ["10.3"],
-///     swiftVersion: "5.4.0",
-///     generationOptions: .options(
-///         xcodeProjectName: "SomePrefix-\(.projectName)-SomeSuffix",
-///         organizationName: "Tuist",
-///         developmentRegion: "de"
-///     )
+///     swiftVersion: "5.4.0"
 /// )
 /// ```
 public struct Config: Codable, Equatable {
@@ -46,8 +41,10 @@ public struct Config: Codable, Equatable {
     /// Cache configuration.
     public let cache: Cache?
 
-    /// The version of Swift that will be used by Tuist.
+    /// The Swift tools versions that will be used by Tuist to fetch external dependencies.
     /// If `nil` is passed then Tuist will use the environment’s version.
+    /// - Note: This **does not** control the `SWIFT_VERSION` build setting in regular generated projects, for this please use `Project.settings`
+    /// or `Target.settings` as needed.
     public let swiftVersion: Version?
 
     /// Creates a tuist configuration.
