@@ -11,6 +11,7 @@ git checkout "$1"
 cd ..
 rm -rf ProjectDescription
 cp -r tuist/Sources/ProjectDescription .
+git add tuist/Sources/ProjectDescription
 git commit -am "$1" --allow-empty
 git push
 git tag "$1"
