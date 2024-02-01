@@ -5,9 +5,9 @@ public struct LaunchArgument: Equatable, Codable {
     // MARK: - Attributes
 
     /// Name of argument
-    public let name: String
+    public var name: String
     /// If enabled then argument is marked as active
-    public let isEnabled: Bool
+    public var isEnabled: Bool
 
     // MARK: - Init
 
@@ -15,9 +15,8 @@ public struct LaunchArgument: Equatable, Codable {
     /// - Parameters:
     ///     - name: Name of argument
     ///     - isEnabled: If enabled then argument is marked as active
-    public init(name: String, isEnabled: Bool) {
-        self.name = name
-        self.isEnabled = isEnabled
+    public static func launchArgument(name: String, isEnabled: Bool) -> Self {
+        self.init(name: name, isEnabled: isEnabled)
     }
 }
 

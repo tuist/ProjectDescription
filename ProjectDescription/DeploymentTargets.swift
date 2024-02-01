@@ -5,22 +5,30 @@ import Foundation
 /// A struct representing the minimum deployment versions for each platform.
 public struct DeploymentTargets: Hashable, Codable {
     /// Minimum deployment version for iOS
-    public let iOS: String?
+    public var iOS: String?
     /// Minimum deployment version for macOS
-    public let macOS: String?
+    public var macOS: String?
     /// Minimum deployment version for watchOS
-    public let watchOS: String?
+    public var watchOS: String?
     /// Minimum deployment version for tvOS
-    public let tvOS: String?
+    public var tvOS: String?
     /// Minimum deployment version for visionOS
-    public let visionOS: String?
+    public var visionOS: String?
 
-    public init(iOS: String? = nil, macOS: String? = nil, watchOS: String? = nil, tvOS: String? = nil, visionOS: String? = nil) {
-        self.iOS = iOS
-        self.macOS = macOS
-        self.watchOS = watchOS
-        self.tvOS = tvOS
-        self.visionOS = visionOS
+    public static func deploymentTargets(
+        iOS: String? = nil,
+        macOS: String? = nil,
+        watchOS: String? = nil,
+        tvOS: String? = nil,
+        visionOS: String? = nil
+    ) -> Self {
+        self.init(
+            iOS: iOS,
+            macOS: macOS,
+            watchOS: watchOS,
+            tvOS: tvOS,
+            visionOS: visionOS
+        )
     }
 
     /// Convenience accessor to retreive a minimum version given a `Platform`

@@ -5,15 +5,19 @@ public struct EnvironmentVariable: Equatable, Codable, Hashable, ExpressibleBySt
     // MARK: - Attributes
 
     /// The value of the environment variable
-    public let value: String
+    public var value: String
     /// Whether the variable is enabled or not
-    public let isEnabled: Bool
+    public var isEnabled: Bool
 
     // MARK: - Init
 
-    public init(value: String, isEnabled: Bool) {
+    init(value: String, isEnabled: Bool) {
         self.value = value
         self.isEnabled = isEnabled
+    }
+
+    public static func environmentVariable(value: String, isEnabled: Bool) -> Self {
+        self.init(value: value, isEnabled: isEnabled)
     }
 
     public init(stringLiteral value: String) {
