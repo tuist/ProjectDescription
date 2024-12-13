@@ -31,9 +31,6 @@ public struct RunAction: Equatable, Codable, Sendable {
     /// List of diagnostics options to set to the action.
     public var diagnosticsOptions: SchemeDiagnosticsOptions
 
-    /// List of metal options to set to the action
-    public var metalOptions: MetalOptions
-
     /// A target that will be used to expand the variables defined inside Environment Variables definition (e.g. $SOURCE_ROOT)
     public var expandVariableFromTarget: TargetReference?
 
@@ -50,7 +47,6 @@ public struct RunAction: Equatable, Codable, Sendable {
         arguments: Arguments? = nil,
         options: RunActionOptions = .options(),
         diagnosticsOptions: SchemeDiagnosticsOptions = .options(),
-        metalOptions: MetalOptions = .options(),
         expandVariableFromTarget: TargetReference? = nil,
         launchStyle: LaunchStyle = .automatically
     ) {
@@ -63,7 +59,6 @@ public struct RunAction: Equatable, Codable, Sendable {
         self.arguments = arguments
         self.options = options
         self.diagnosticsOptions = diagnosticsOptions
-        self.metalOptions = metalOptions
         self.expandVariableFromTarget = expandVariableFromTarget
         self.launchStyle = launchStyle
     }
@@ -78,7 +73,6 @@ public struct RunAction: Equatable, Codable, Sendable {
     ///   - arguments: Command line arguments passed on launch and environment variables.
     ///   - options: List of options to set to the action.
     ///   - diagnosticsOptions: List of diagnostics options to set to the action.
-    ///   - metalOptions: List of metal options to set to the action.
     ///   - expandVariableFromTarget: A target that will be used to expand the variables defined inside Environment Variables
     /// definition (e.g. $SOURCE_ROOT). When nil, it does not expand any variables.
     ///   - launchStyle: The launch style of the action
@@ -93,7 +87,6 @@ public struct RunAction: Equatable, Codable, Sendable {
         arguments: Arguments? = nil,
         options: RunActionOptions = .options(),
         diagnosticsOptions: SchemeDiagnosticsOptions = .options(),
-        metalOptions: MetalOptions = .options(),
         expandVariableFromTarget: TargetReference? = nil,
         launchStyle: LaunchStyle = .automatically
     ) -> RunAction {
@@ -107,7 +100,6 @@ public struct RunAction: Equatable, Codable, Sendable {
             arguments: arguments,
             options: options,
             diagnosticsOptions: diagnosticsOptions,
-            metalOptions: metalOptions,
             expandVariableFromTarget: expandVariableFromTarget,
             launchStyle: launchStyle
         )

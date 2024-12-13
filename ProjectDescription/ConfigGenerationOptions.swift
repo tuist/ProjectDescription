@@ -1,4 +1,4 @@
-extension Tuist {
+extension Config {
     /// Options for project generation.
     public struct GenerationOptions: Codable, Equatable, Sendable {
         /**
