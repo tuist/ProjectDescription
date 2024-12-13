@@ -1,12 +1,11 @@
 import Foundation
 
 /// A cloud configuration, used for remote caching.
-public struct Cloud: Codable, Equatable {
+public struct Cloud: Codable, Equatable, Sendable {
     /// Options for cloud configuration.
-    public enum Option: String, Codable, Equatable {
-        /// Marks whether cloud connection is optional.
-        /// If not present, tuist commands will fail regardless of whether an authentication token is available locally from
-        /// `tuist cloud auth` or not.
+    public enum Option: String, Codable, Equatable, Sendable {
+        /// Marks whether the Tuist server authentication is optional.
+        /// If present, the interaction with the Tuist server will be skipped (instead of failing) if a user is not authenticated.
         case optional
     }
 
@@ -25,7 +24,8 @@ public struct Cloud: Codable, Equatable {
     ///   - url: Base URL to the Cloud server.
     ///   - options: Cloud options.
     /// - Returns: A Cloud instance.
-    public static func cloud(projectId: String, url: String = "https://cloud.tuist.io", options: [Option] = []) -> Cloud {
+    @available(*, deprecated, message: "Use the `fullHandle` and `url` properties directly in the `Config`")
+    public static func cloud(projectId: String, url: String = "https://tuist.dev", options: [Option] = []) -> Cloud {
         Cloud(url: url, projectId: projectId, options: options)
     }
 }

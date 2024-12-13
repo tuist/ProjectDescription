@@ -55,6 +55,9 @@ extension SettingsDictionary {
     }
 
     /// Sets `"CODE_SIGN_STYLE"` to `"Automatic"` and `"DEVELOPMENT_TEAM"` to `devTeam`
+    /// - Parameters:
+    ///   - devTeam: Your Apple Developer Team ID. See
+    /// [here](https://developer.apple.com/help/account/manage-your-team/locate-your-team-id/) how you can find it.
     public func automaticCodeSigning(devTeam: String) -> SettingsDictionary {
         merging([
             "CODE_SIGN_STYLE": "Automatic",
@@ -109,13 +112,25 @@ extension SettingsDictionary {
     // MARK: - Swift Compiler - Custom Flags
 
     /// Sets `"OTHER_SWIFT_FLAGS"` to `flags`
+    @available(*, deprecated, message: "Please use the version with array support")
     public func otherSwiftFlags(_ flags: String...) -> SettingsDictionary {
-        merging(["OTHER_SWIFT_FLAGS": SettingValue(flags.joined(separator: " "))])
+        otherSwiftFlags(flags)
+    }
+
+    /// Sets `"OTHER_SWIFT_FLAGS"` to `flags`
+    public func otherSwiftFlags(_ flags: [String]) -> SettingsDictionary {
+        merging(["OTHER_SWIFT_FLAGS": .array(flags)])
     }
 
     /// Sets `"SWIFT_ACTIVE_COMPILATION_CONDITIONS"` to `conditions`
+    @available(*, deprecated, message: "Please use the version with array support")
     public func swiftActiveCompilationConditions(_ conditions: String...) -> SettingsDictionary {
-        merging(["SWIFT_ACTIVE_COMPILATION_CONDITIONS": SettingValue(conditions.joined(separator: " "))])
+        swiftActiveCompilationConditions(conditions)
+    }
+
+    /// Sets `"SWIFT_ACTIVE_COMPILATION_CONDITIONS"` to `conditions`
+    public func swiftActiveCompilationConditions(_ conditions: [String]) -> SettingsDictionary {
+        merging(["SWIFT_ACTIVE_COMPILATION_CONDITIONS": .array(conditions)])
     }
 
     // MARK: - Swift Compiler - Code Generation
@@ -170,5 +185,13 @@ extension SettingsDictionary {
     /// Sets `"DEBUG_INFORMATION_FORMAT"`to `"dwarf"` or `"dwarf-with-dsym"`
     public func debugInformationFormat(_ format: DebugInformationFormat) -> SettingsDictionary {
         merging(["DEBUG_INFORMATION_FORMAT": SettingValue(format)])
+    }
+
+    /// Sets `"_EXPERIMENTAL_SWIFT_EXPLICIT_MODULES"`
+    /// NOTE: This is only available when using Xcode 16 or later.
+    /// This setting may change and is not guaranteed to work across all beta versions.
+    public func betaFeature_enableExplicitModules(_ enabled: Bool) -> SettingsDictionary {
+        // This is the value as of Xcode 16 beta 1
+        merging(["_EXPERIMENTAL_SWIFT_EXPLICIT_MODULES": SettingValue(enabled)])
     }
 }

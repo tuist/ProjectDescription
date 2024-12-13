@@ -14,8 +14,7 @@ import Foundation
 ///     let packageSettings = PackageSettings(
 ///         productTypes: [
 ///             "Alamofire": .framework, // default is .staticFramework
-///         ],
-///         platforms: [.iOS]
+///         ]
 ///     )
 /// #endif
 ///
@@ -26,40 +25,70 @@ import Foundation
 ///     ]
 /// )
 /// ```
-public struct PackageSettings: Codable, Equatable {
+public struct PackageSettings: Codable, Equatable, Sendable {
     /// The custom `Product` type to be used for SPM targets.
     public var productTypes: [String: Product]
+
+    /// Custom product destinations where key of the dictionary is the name of the SPM product and the value contains the
+    /// supported destinations.
+    /// **Note**: This setting should only be used when using Tuist for SPM package projects, _not_ for your external
+    /// dependencies.
+    /// SPM implicitly always supports all platforms, but some commands like `tuist cache` depend on destinations being explicit.
+    /// If a product does not support all destinations, you can use `productDestinations` to make the supported destinations
+    /// explicit.
+    public var productDestinations: [String: Destinations]
 
     // The base settings to be used for targets generated from SwiftPackageManager
     public var baseSettings: Settings
 
     // Additional settings to be added to targets generated from SwiftPackageManager.
-    public var targetSettings: [String: SettingsDictionary]
+    public var targetSettings: [String: Settings]
 
     /// Custom project configurations to be used for projects generated from SwiftPackageManager.
     public var projectOptions: [String: Project.Options]
 
-    /// The custom set of `platforms` that are used by your project
-    public let platforms: Set<PackagePlatform>
-
     /// Creates `PackageSettings` instance for custom Swift Package Manager configuration.
-    /// - Parameter productTypes: The custom `Product` types to be used for SPM targets.
-    /// - Parameter baseSettings: Additional settings to be added to targets generated from SwiftPackageManager.
-    /// - Parameter targetSettings: Additional settings to be added to targets generated from SwiftPackageManager.
-    /// - Parameter projectOptions: Custom project configurations to be used for projects generated from SwiftPackageManager.
-    /// - Parameter platforms: The custom set of `platforms` that are used by your project
+    /// - Parameters:
+    ///     - productTypes: The custom `Product` types to be used for SPM targets.
+    ///     - productDestinations: Custom destinations to be used for SPM products.
+    ///     - baseSettings: Additional settings to be added to targets generated from SwiftPackageManager.
+    ///     - targetSettings: Additional settings to be added to targets generated from SwiftPackageManager.
+    ///     - projectOptions: Custom project configurations to be used for projects generated from SwiftPackageManager.
     public init(
         productTypes: [String: Product] = [:],
+        productDestinations: [String: Destinations] = [:],
         baseSettings: Settings = .settings(),
-        targetSettings: [String: SettingsDictionary] = [:],
-        projectOptions: [String: Project.Options] = [:],
-        platforms: Set<PackagePlatform> = Set(PackagePlatform.allCases)
+        targetSettings: [String: Settings] = [:],
+        projectOptions: [String: Project.Options] = [:]
     ) {
         self.productTypes = productTypes
+        self.productDestinations = productDestinations
         self.baseSettings = baseSettings
         self.targetSettings = targetSettings
         self.projectOptions = projectOptions
-        self.platforms = platforms
+        dumpIfNeeded(self)
+    }
+
+    /// Creates `PackageSettings` instance for custom Swift Package Manager configuration.
+    /// - Parameters:
+    ///     - productTypes: The custom `Product` types to be used for SPM targets.
+    ///     - productDestinations: Custom destinations to be used for SPM products.
+    ///     - baseSettings: Additional settings to be added to targets generated from SwiftPackageManager.
+    ///     - targetSettings: Additional settings to be added to targets generated from SwiftPackageManager.
+    ///     - projectOptions: Custom project configurations to be used for projects generated from SwiftPackageManager.
+    @available(*, deprecated, renamed: "init(productTypes:productDescrtiptions:baseSettings:targetSettings:projectOptions:)")
+    public init(
+        productTypes: [String: Product] = [:],
+        productDestinations: [String: Destinations] = [:],
+        baseSettings: Settings = .settings(),
+        targetSettings: [String: SettingsDictionary],
+        projectOptions: [String: Project.Options] = [:]
+    ) {
+        self.productTypes = productTypes
+        self.productDestinations = productDestinations
+        self.baseSettings = baseSettings
+        self.targetSettings = targetSettings.mapValues { .settings(base: $0) }
+        self.projectOptions = projectOptions
         dumpIfNeeded(self)
     }
 }
