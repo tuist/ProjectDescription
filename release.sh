@@ -10,7 +10,7 @@ git fetch
 git checkout "$1"
 cd ..
 rm -rf ProjectDescription
-cp -r tuist/Sources/ProjectDescription .
+cp -r tuist/cli/Sources/ProjectDescription .
 git add ProjectDescription/**
 git commit -am "$1" --allow-empty
 git push
