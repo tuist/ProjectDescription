@@ -126,7 +126,7 @@ extension Tuist {
             testInsightsDisabled: Bool = false,
             disableSandbox: Bool = true,
             includeGenerateScheme: Bool = true,
-            enableCaching: Bool = false,
+            enableCaching: Bool = false
         ) -> Self {
             self.init(
                 resolveDependenciesWithSystemScm: resolveDependenciesWithSystemScm,
@@ -148,7 +148,7 @@ extension Tuist {
         @available(
             *,
             deprecated,
-            message: "enforceExplicitDependencies is deprecated. Use the new tuist inspect implicit-imports instead."
+            message: "enforceExplicitDependencies is deprecated. Use 'tuist inspect dependencies --only implicit' instead."
         )
         public static func options(
             resolveDependenciesWithSystemScm: Bool = false,
