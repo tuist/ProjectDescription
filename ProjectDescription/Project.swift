@@ -13,11 +13,11 @@
 ///     name: "MyProject",
 ///     organizationName: "MyOrg",
 ///     targets: [
-///         Target(
+///         .target(
 ///             name: "App",
 ///             destinations: .iOS,
 ///             product: .app,
-///             bundleId: "io.tuist.App",
+///             bundleId: "dev.tuist.App",
 ///             infoPlist: "Config/App-Info.plist",
 ///             sources: ["Sources/**"],
 ///             resources: [

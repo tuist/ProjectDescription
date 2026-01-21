@@ -1,27 +1,47 @@
 extension Tuist {
     /// Options for project generation.
     public struct GenerationOptions: Codable, Equatable, Sendable {
-        /**
-         This enum represents the targets against which Tuist will run the check for potential side effects
-         caused by static transitive dependencies.
-         */
+        /// This enum represents the targets against which Tuist will run the check for potential side effects
+        /// caused by static transitive dependencies.
         public enum StaticSideEffectsWarningTargets: Codable, Equatable, Sendable {
             case all
             case none
             case excluding([String])
         }
 
-        /// When passed, Xcode will resolve its Package Manager dependencies using the system-defined
-        /// accounts (for example, git) instead of the Xcode-defined accounts
+        /// This is now deprecated.
+        ///
+        /// To achieve the same behaviour, use `additionalPackageResolutionArguments` like so:
+        ///
+        /// ```swift
+        /// .options(
+        ///     additionalPackageResolutionArguments: ["-scmProvider", "system"]
+        /// )
+        /// ```
+        @available(*, deprecated, message: "Use `additionalPackageResolutionArguments` instead.")
         public var resolveDependenciesWithSystemScm: Bool
 
         /// Disables locking Swift packages. This can speed up generation but does increase risk if packages are not locked
         /// in their declarations.
         public var disablePackageVersionLocking: Bool
 
-        /// Allows setting a custom directory to be used when resolving package dependencies
-        /// This path is passed to `xcodebuild` via the `-clonedSourcePackagesDirPath` argument
+        /// This is now deprecated.
+        ///
+        /// To achieve the same behaviour, use `additionalPackageResolutionArguments` like so:
+        ///
+        /// ```swift
+        /// .options(
+        ///     additionalPackageResolutionArguments: ["-clonedSourcePackagesDirPath", "/path/to/dir/MyWorkspace"]
+        /// )
+        /// ```
+        ///
+        /// Note that `/path/to/dir` is the path you would have passed to `clonedSourcePackagesDirPath`,
+        /// and `MyWorkspace` is the name of your workspace.
+        @available(*, deprecated, message: "Use `additionalPackageResolutionArguments` instead.")
         public var clonedSourcePackagesDirPath: Path?
+
+        /// A list of arguments to be passed to `xcodebuild` when resolving package dependencies.
+        public var additionalPackageResolutionArguments: [String]
 
         /// Allows configuring which targets Tuist checks for potential side effects due multiple branches of the graph
         /// including the same static library of framework as a transitive dependency.
@@ -41,9 +61,60 @@ extension Tuist {
 
         /// When disabled, build insights are not collected. Build insights are never collected unless you are connected to a
         /// remote Tuist project.
-        /// Default value is `true`.
         public var buildInsightsDisabled: Bool
 
+        /// When disabled, test insights are not collected. Test insights are never collected unless you are connected to a
+        /// remote Tuist project.
+        public var testInsightsDisabled: Bool
+
+        /// Disables building manifests in a sandboxed environment. This option is currently opt-in.
+        ///
+        /// - It is encouraged to set `disableSandbox` to `false` (and thus to enable it). It guards against using file system
+        /// operations which:
+        ///   - Make generation slow
+        ///   - Cause issues with manifest caching
+        public var disableSandbox: Bool
+
+        /// When true, it includes a scheme to run "tuist generate"
+        public var includeGenerateScheme: Bool
+
+        /// When enabled, adds Xcode cache compilation settings to the project
+        public var enableCaching: Bool
+
+        public static func options(
+            disablePackageVersionLocking: Bool = false,
+            staticSideEffectsWarningTargets: StaticSideEffectsWarningTargets = .all,
+            defaultConfiguration: String? = nil,
+            optionalAuthentication: Bool = false,
+            buildInsightsDisabled: Bool = false,
+            testInsightsDisabled: Bool = false,
+            disableSandbox: Bool = true,
+            includeGenerateScheme: Bool = true,
+            enableCaching: Bool = false,
+            additionalPackageResolutionArguments: [String] = []
+        ) -> Self {
+            self.init(
+                resolveDependenciesWithSystemScm: false,
+                disablePackageVersionLocking: disablePackageVersionLocking,
+                clonedSourcePackagesDirPath: nil,
+                additionalPackageResolutionArguments: additionalPackageResolutionArguments,
+                staticSideEffectsWarningTargets: staticSideEffectsWarningTargets,
+                enforceExplicitDependencies: false,
+                defaultConfiguration: defaultConfiguration,
+                optionalAuthentication: optionalAuthentication,
+                buildInsightsDisabled: buildInsightsDisabled,
+                testInsightsDisabled: testInsightsDisabled,
+                disableSandbox: disableSandbox,
+                includeGenerateScheme: includeGenerateScheme,
+                enableCaching: enableCaching
+            )
+        }
+
+        @available(
+            *,
+            deprecated,
+            message: "Use `options(disablePackageVersionLocking:staticSideEffectsWarningTargets:defaultConfiguration:optionalAuthentication:buildInsightsDisabled:testInsightsDisabled:disableSandbox:includeGenerateScheme:additionalPackageResolutionArguments)` instead."
+        )
         public static func options(
             resolveDependenciesWithSystemScm: Bool = false,
             disablePackageVersionLocking: Bool = false,
@@ -51,17 +122,26 @@ extension Tuist {
             staticSideEffectsWarningTargets: StaticSideEffectsWarningTargets = .all,
             defaultConfiguration: String? = nil,
             optionalAuthentication: Bool = false,
-            buildInsightsDisabled: Bool = false
+            buildInsightsDisabled: Bool = false,
+            testInsightsDisabled: Bool = false,
+            disableSandbox: Bool = true,
+            includeGenerateScheme: Bool = true,
+            enableCaching: Bool = false,
         ) -> Self {
             self.init(
                 resolveDependenciesWithSystemScm: resolveDependenciesWithSystemScm,
                 disablePackageVersionLocking: disablePackageVersionLocking,
                 clonedSourcePackagesDirPath: clonedSourcePackagesDirPath,
+                additionalPackageResolutionArguments: [],
                 staticSideEffectsWarningTargets: staticSideEffectsWarningTargets,
                 enforceExplicitDependencies: false,
                 defaultConfiguration: defaultConfiguration,
                 optionalAuthentication: optionalAuthentication,
-                buildInsightsDisabled: buildInsightsDisabled
+                buildInsightsDisabled: buildInsightsDisabled,
+                testInsightsDisabled: testInsightsDisabled,
+                disableSandbox: disableSandbox,
+                includeGenerateScheme: includeGenerateScheme,
+                enableCaching: enableCaching
             )
         }
 
@@ -83,11 +163,16 @@ extension Tuist {
                 resolveDependenciesWithSystemScm: resolveDependenciesWithSystemScm,
                 disablePackageVersionLocking: disablePackageVersionLocking,
                 clonedSourcePackagesDirPath: clonedSourcePackagesDirPath,
+                additionalPackageResolutionArguments: [],
                 staticSideEffectsWarningTargets: staticSideEffectsWarningTargets,
                 enforceExplicitDependencies: enforceExplicitDependencies,
                 defaultConfiguration: defaultConfiguration,
                 optionalAuthentication: optionalAuthentication,
-                buildInsightsDisabled: false
+                buildInsightsDisabled: false,
+                testInsightsDisabled: false,
+                disableSandbox: true,
+                includeGenerateScheme: false,
+                enableCaching: false
             )
         }
     }
