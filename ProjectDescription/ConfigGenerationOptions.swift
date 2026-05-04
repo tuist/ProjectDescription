@@ -9,6 +9,25 @@ extension Tuist {
             case excluding([String])
         }
 
+        /// Categories of warnings that can be promoted to errors.
+        public enum GenerationWarning: String, Codable, Equatable, Hashable, Sendable {
+            case outdatedDependencies
+            case staticSideEffects
+            case schemeTargetNotFound
+            case mismatchedConfigurations
+            case duplicateProductNames
+        }
+
+        /// Controls which generation warnings are promoted to errors.
+        public enum WarningsAsErrors: Codable, Equatable, Sendable {
+            /// No warnings are promoted to errors (default behavior).
+            case none
+            /// All warnings are promoted to errors.
+            case all
+            /// Only the specified warning categories are promoted to errors.
+            case only([GenerationWarning])
+        }
+
         /// This is now deprecated.
         ///
         /// To achieve the same behaviour, use `additionalPackageResolutionArguments` like so:
@@ -81,6 +100,20 @@ extension Tuist {
         /// When enabled, adds Xcode cache compilation settings to the project
         public var enableCaching: Bool
 
+        /// When enabled, generates the Swift Package Registry configuration file during project generation.
+        /// This eliminates the need to run `tuist registry setup` separately.
+        public var registryEnabled: Bool
+
+        /// Controls which generation warnings are promoted to errors, causing `tuist generate` to fail.
+        public var warningsAsErrors: WarningsAsErrors
+
+        /// The default Swift language mode (`SWIFT_VERSION` build setting) applied to local targets
+        /// that don't specify one. This controls which Swift language mode the compiler uses
+        /// (e.g. `"5"` for Swift 5 mode, `"6"` for Swift 6 strict concurrency mode).
+        /// External SPM packages are not affected — their language mode is derived from their
+        /// own `Package.swift` manifest, matching SPM's behavior.
+        public var defaultSwiftVersion: String
+
         public static func options(
             disablePackageVersionLocking: Bool = false,
             staticSideEffectsWarningTargets: StaticSideEffectsWarningTargets = .all,
@@ -91,7 +124,10 @@ extension Tuist {
             disableSandbox: Bool = true,
             includeGenerateScheme: Bool = true,
             enableCaching: Bool = false,
-            additionalPackageResolutionArguments: [String] = []
+            registryEnabled: Bool = false,
+            additionalPackageResolutionArguments: [String] = [],
+            warningsAsErrors: WarningsAsErrors = .none,
+            defaultSwiftVersion: String = "5"
         ) -> Self {
             self.init(
                 resolveDependenciesWithSystemScm: false,
@@ -106,10 +142,14 @@ extension Tuist {
                 testInsightsDisabled: testInsightsDisabled,
                 disableSandbox: disableSandbox,
                 includeGenerateScheme: includeGenerateScheme,
-                enableCaching: enableCaching
+                enableCaching: enableCaching,
+                registryEnabled: registryEnabled,
+                warningsAsErrors: warningsAsErrors,
+                defaultSwiftVersion: defaultSwiftVersion
             )
         }
 
+        @_disfavoredOverload
         @available(
             *,
             deprecated,
@@ -141,7 +181,10 @@ extension Tuist {
                 testInsightsDisabled: testInsightsDisabled,
                 disableSandbox: disableSandbox,
                 includeGenerateScheme: includeGenerateScheme,
-                enableCaching: enableCaching
+                enableCaching: enableCaching,
+                registryEnabled: false,
+                warningsAsErrors: .none,
+                defaultSwiftVersion: "5"
             )
         }
 
@@ -172,7 +215,10 @@ extension Tuist {
                 testInsightsDisabled: false,
                 disableSandbox: true,
                 includeGenerateScheme: false,
-                enableCaching: false
+                enableCaching: false,
+                registryEnabled: false,
+                warningsAsErrors: .none,
+                defaultSwiftVersion: "5"
             )
         }
     }

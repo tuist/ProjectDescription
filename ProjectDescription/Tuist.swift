@@ -28,6 +28,19 @@
 public typealias Config = Tuist
 
 public struct Tuist: Codable, Equatable, Sendable {
+    /// Options for configuring the Xcode Cache behavior.
+    public struct Cache: Codable, Equatable, Sendable {
+        /// When `true` (default), the local proxy uploads artifacts to the remote cache.
+        /// Set to `false` for read-only mode (downloads only, no uploads).
+        public let upload: Bool
+
+        /// Creates cache options.
+        /// - Parameter upload: Whether to upload artifacts to the remote cache. Defaults to `true`.
+        public static func cache(upload: Bool = true) -> Self {
+            Cache(upload: upload)
+        }
+    }
+
     /// Configures the project Tuist will interact with.
     /// When no project is provided, Tuist defaults to the workspace or project in the current directory.
     public let project: TuistProject
@@ -38,6 +51,9 @@ public struct Tuist: Codable, Equatable, Sendable {
     /// The options to use when running `tuist inspect`.
     public let inspectOptions: InspectOptions
 
+    /// The Xcode Cache configuration.
+    public let cache: Cache
+
     /// The base URL that points to the Tuist server.
     public let url: String
 
@@ -46,7 +62,6 @@ public struct Tuist: Codable, Equatable, Sendable {
     /// - Parameters:
     ///   - compatibleXcodeVersions: List of Xcode versions the project is compatible with.
     ///   - cloud: Cloud configuration.
-    ///   - swiftVersion: The version of Swift that will be used by Tuist.
     ///   - plugins: A list of plugins to extend Tuist.
     ///   - generationOptions: List of options to use when generating the project.
     ///   - installOptions: List of options to use when running `tuist install`.
@@ -60,7 +75,7 @@ public struct Tuist: Codable, Equatable, Sendable {
         cloud: Cloud? = nil,
         fullHandle: String? = nil,
         url: String = "https://tuist.dev",
-        swiftVersion: Version? = nil,
+        swiftVersion _: Version? = nil,
         plugins: [PluginLocation] = [],
         generationOptions: GenerationOptions = .options(),
         inspectOptions: InspectOptions = .options(),
@@ -75,13 +90,13 @@ public struct Tuist: Codable, Equatable, Sendable {
 
         project = TuistProject.tuist(
             compatibleXcodeVersions: compatibleXcodeVersions,
-            swiftVersion: swiftVersion,
             plugins: plugins,
             generationOptions: generationOptions,
             installOptions: installOptions
         )
         self.fullHandle = fullHandle
         self.inspectOptions = inspectOptions
+        cache = .cache()
         self.url = url
         dumpIfNeeded(self)
     }
@@ -89,12 +104,14 @@ public struct Tuist: Codable, Equatable, Sendable {
     public init(
         fullHandle: String? = nil,
         inspectOptions: InspectOptions = .options(),
+        cache: Cache = .cache(),
         url: String = "https://tuist.dev",
         project: TuistProject
     ) {
         self.project = project
         self.fullHandle = fullHandle
         self.inspectOptions = inspectOptions
+        self.cache = cache
         self.url = url
         dumpIfNeeded(self)
     }
